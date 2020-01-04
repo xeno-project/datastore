@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.0.1
+- removed all other google libraries
+- moved datastore files to the root folder
+- removed google imports from datastore code
+- added xeno-project hooks
+
+
 [PyPI History][1]
 
 [1]: https://pypi.org/project/google-cloud/#history
