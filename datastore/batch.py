@@ -120,7 +120,7 @@ class Batch(object):
 
 		#_assign_entity_to_pb(entity_pb, entity)
 
-		from viur.xeno.database import dbinterface
+		from viur.xeno.databases import dbinterface
 		dbinterface.put(entity)
 
 	def delete(self, key):
@@ -145,7 +145,7 @@ class Batch(object):
 		#key_pb = key.to_protobuf()
 		#self._add_delete_key_pb().CopyFrom(key_pb)
 
-		from viur.xeno.database import dbinterface
+		from viur.xeno.databases import dbinterface
 		dbinterface.delete(key)
 
 	def begin(self):
@@ -163,7 +163,7 @@ class Batch(object):
 			raise ValueError("Batch already started previously.")
 		self._status = self._IN_PROGRESS
 
-		from viur.xeno.database import dbinterface
+		from viur.xeno.databases import dbinterface
 		dbinterface.transaction_start()
 
 
@@ -181,7 +181,7 @@ class Batch(object):
 			raise ValueError("Batch must be in progress to commit()")
 
 		try:
-			from viur.xeno.database import dbinterface
+			from viur.xeno.databases import dbinterface
 			dbinterface.transaction_commit()
 		finally:
 			self._status = self._FINISHED
@@ -201,7 +201,7 @@ class Batch(object):
 
 		self._status = self._ABORTED
 
-		from viur.xeno.database import dbinterface
+		from viur.xeno.databases import dbinterface
 		dbinterface.transaction_rollback()
 
 	def __enter__(self):

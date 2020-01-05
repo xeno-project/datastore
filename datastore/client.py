@@ -58,7 +58,7 @@ class Client(object):
 
 		self._batch_stack = LIFO()
 
-		from viur.xeno.database import dbinterface
+		from viur.xeno.databases import dbinterface
 		dbinterface.connect()
 
 	def _push_batch(self, batch):
@@ -198,7 +198,7 @@ class Client(object):
 		if transaction is None:
 			transaction = self.current_transaction
 
-		from viur.xeno.database import dbinterface
+		from viur.xeno.databases import dbinterface
 		entities = dbinterface.get_multi(keys)
 
 		if missing is not None:

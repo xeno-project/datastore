@@ -99,8 +99,8 @@ class Key(object):
 			curr_key_path = {
 				"kind": kind
 			}
-			logging.error(id_or_name)
-			logging.error(kind)
+			#logging.error(id_or_name)
+			#logging.error(kind)
 			if isinstance(id_or_name, str):
 				curr_key_path["name"] = id_or_name
 			elif isinstance(id_or_name, int):

@@ -292,12 +292,6 @@ class Iterator(object):
 		end_cursor=None,
 		eventual=False,
 	):
-		super(Iterator, self).__init__(
-			client=client,
-			item_to_value=_item_to_entity,
-			page_token=start_cursor,
-			max_results=limit,
-		)
 		self._started = False
 		self.client = client
 		self.item_to_value = Entity
@@ -350,7 +344,7 @@ class Iterator(object):
 		else:
 			transaction_id = transaction.id #FIXME
 
-		from viur.xeno.database import dbinterface
+		from viur.xeno.databases import dbinterface
 		entities = dbinterface.query(self._query)
 
 		return Page(self, entities, self.item_to_value)
