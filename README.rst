@@ -1,7 +1,7 @@
 Datastore Adapter
 ==========================
 
-This code is the prototype of a google Cloud Database adapter. Der Adapter soll es ermöglichen andere Datenbanken über die gleiche API anzusprechen.
+This code is the prototype of a google Cloud Database adapter. The adapter should make it possible to access other databases using the same API.
 The adapter contains no google dependencies and contains hardcoded hooks for the xeno-project.
 
 If you are looking for google's datastore library, go here :
