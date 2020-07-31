@@ -15,12 +15,13 @@
 # Modifications copyright 2020 Andreas H. Kelch
 #  - removed google dependency
 #
+from viur.database.datastore.key import Key
 
 class Entity(dict):
 
 	def __init__(self, key=None, exclude_from_indexes=()):
 		super(Entity, self).__init__()
-		self.key = key
+		self.key = Key(*key) if isinstance(key,tuple) else key
 		self.exclude_from_indexes = exclude_from_indexes
 		self._meanings = {}
 

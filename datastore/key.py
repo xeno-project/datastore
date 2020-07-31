@@ -15,7 +15,7 @@
 # Modifications copyright 2020 Andreas H. Kelch
 #  - removed google dependency
 #
-import copy
+import copy,six
 
 class Key(object):
 
@@ -87,9 +87,8 @@ class Key(object):
 
 
 		kind_list = path_args[::2]
-		id_or_name_list = path_args[1::2]
+		id_or_name_list = list(path_args[1::2])
 		partial_ending = object()
-
 		if len(path_args) % 2 == 1:
 			id_or_name_list.append(partial_ending)
 
@@ -134,6 +133,46 @@ class Key(object):
 			self._project = self._parent.project
 
 		return child_path
+
+	def _clone(self):
+		"""Duplicates the Key.
+		Most attributes are simple types, so don't require copying. Other
+		attributes like ``parent`` are long-lived and so we re-use them.
+		:rtype: :class:`google.cloud.datastore.key.Key`
+		:returns: A new ``Key`` instance with the same data as the current one.
+		"""
+		cloned_self = self.__class__(
+			*self.flat_path, project=self.project, namespace=self.namespace
+		)
+		# If the current parent has already been set, we re-use
+		# the same instance
+		cloned_self._parent = self._parent
+		return cloned_self
+
+	def completed_key(self, id_or_name):
+		"""Creates new key from existing partial key by adding final ID/name.
+		:type id_or_name: str or integer
+		:param id_or_name: ID or name to be added to the key.
+		:rtype: :class:`google.cloud.datastore.key.Key`
+		:returns: A new ``Key`` instance with the same data as the current one
+				  and an extra ID or name added.
+		:raises: :class:`ValueError` if the current key is not partial or if
+				 ``id_or_name`` is not a string or integer.
+		"""
+		if not self.is_partial:
+			raise ValueError("Only a partial key can be completed.")
+
+		if isinstance(id_or_name, six.string_types):
+			id_or_name_key = "name"
+		elif isinstance(id_or_name, six.integer_types):
+			id_or_name_key = "id"
+		else:
+			raise ValueError(id_or_name, "ID/name was not a string or integer.")
+
+		new_key = self._clone()
+		new_key._path[-1][id_or_name_key] = id_or_name
+		new_key._flat_path += (id_or_name,)
+		return new_key
 
 	@property
 	def is_partial(self):

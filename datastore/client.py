@@ -190,6 +190,8 @@ class Client(object):
 		if not keys:
 			return []
 
+		keys = [ Key(*key) if isinstance(key,tuple) else key for key in keys]
+
 		ids = set(key.project for key in keys)
 		for current_id in ids:
 			if current_id != self.project:
@@ -286,6 +288,44 @@ class Client(object):
 
 		if not in_batch:
 			current.commit()
+
+	def allocate_ids(self, incomplete_key, num_ids):
+		"""Allocate a list of IDs from a partial key.
+
+		:type incomplete_key: :class:`google.cloud.datastore.key.Key`
+		:param incomplete_key: Partial key to use as base for allocated IDs.
+
+		:type num_ids: int
+		:param num_ids: The number of IDs to allocate.
+
+		:rtype: list of :class:`google.cloud.datastore.key.Key`
+		:returns: The (complete) keys allocated with ``incomplete_key`` as
+				  root.
+		:raises: :class:`ValueError` if ``incomplete_key`` is not a
+				 partial key.
+		"""
+		if not incomplete_key.is_partial:
+			raise ValueError(('Key is not partial.', incomplete_key))
+
+		if num_ids>1:
+			raise ValueError("Actually you can only request one Key")
+
+		from random import random
+		from time import time
+		newId = int(time()*1000)^int(random()*10000000000000) #we need something better
+
+		return [incomplete_key.completed_key(newId)]
+
+		incomplete_key_pb = incomplete_key.to_protobuf()
+		incomplete_key_pbs = [incomplete_key_pb] * num_ids
+
+		conn = self.connection
+		allocated_key_pbs = conn.allocate_ids(incomplete_key.project,
+											  incomplete_key_pbs)
+		allocated_ids = [allocated_key_pb.path[-1].id
+						 for allocated_key_pb in allocated_key_pbs]
+		return [incomplete_key.completed_key(allocated_id)
+				for allocated_id in allocated_ids]
 
 	def key(self, *path_args, **kwargs):
 		"""Proxy to :class:`google.cloud.datastore.key.Key`.
