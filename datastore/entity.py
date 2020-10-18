@@ -22,7 +22,7 @@ class Entity(dict):
 	def __init__(self, key=None, exclude_from_indexes=()):
 		super(Entity, self).__init__()
 		self.key = Key(*key) if isinstance(key,tuple) else key
-		self.exclude_from_indexes = exclude_from_indexes
+		self.exclude_from_indexes = set(exclude_from_indexes)
 		self._meanings = {}
 
 	def __eq__(self, other):
@@ -94,3 +94,15 @@ class Entity(dict):
 			)
 		else:
 			return "<Entity %s>" % (super(Entity, self).__repr__())
+
+
+	def toDict( self ):
+		if self.key:
+			self["__keyDB__"] = {"ext.type":"key","kind":self.key.kind, "key":self.key.id_or_name}
+
+		return dict(self)
+
+	def fromDict( self ):
+		if self["__keyDB__"]:
+			self.key = Key(self["__keyDB__"]["kind"],self["__keyDB__"]["key"])
+		return self
