@@ -16,6 +16,7 @@
 #  - removed google dependency
 #
 import copy,six
+import json, base64
 
 class Key(object):
 
@@ -295,3 +296,30 @@ class Key(object):
 
 	def __repr__(self):
 		return "<Key%s, project=%s>" % (self._flat_path, self.project)
+
+	def to_legacy_urlsafe( self, location_prefix = None ):
+		if location_prefix is None:
+			project_id = self.project
+		else:
+			project_id = location_prefix + self.project
+
+		raw_bytes = json.dumps([self._flat_path,project_id,self.namespace]).encode()
+
+		return base64.urlsafe_b64encode( raw_bytes ).strip( b"=" )
+
+	@classmethod
+	def from_legacy_urlsafe( cls, urlsafe ):
+		#try:
+		#	urlsafe = urlsafe.encode()
+		#except :
+		#	pass
+		padding = "=" * (-len( urlsafe ) % 4)
+		urlsafe += padding
+		raw_bytes = base64.urlsafe_b64decode( urlsafe )
+		import logging
+		#logging.error(urlsafe)
+		#logging.error(raw_bytes)
+		#logging.error(raw_bytes.decode("utf-8"))
+		keyobj = json.loads(raw_bytes.decode())
+
+		return cls( *keyobj[0], project = keyobj[1], namespace = keyobj[2] )
