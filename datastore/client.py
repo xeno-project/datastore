@@ -312,7 +312,14 @@ class Client(object):
 
 		from random import random
 		from time import time
-		newId = int(time()*1000)^int(random()*10000000000000) #we need something better
+
+
+
+		try:
+			from viur.xeno.databases import dbinterface
+			newId = str(dbinterface.generateID())
+		except :
+			newId = int(time()*1000)^int(random()*10000000000000) #we need something better
 
 		return [incomplete_key.completed_key(newId)]
 
