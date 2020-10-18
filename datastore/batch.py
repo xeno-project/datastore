@@ -165,6 +165,7 @@ class Batch(object):
 
 		from viur.xeno.databases import dbinterface
 		dbinterface.transaction_start()
+		dbinterface.transaction_rollback()
 
 
 	def commit(self):
